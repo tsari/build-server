@@ -27,7 +27,7 @@ RUN \
 
 # add user
 RUN useradd -ms /bin/bash build
-RUN mkdir /home/build/bin
+RUN mkdir /home/build/bin && chmod -R 777 /home/build
 
 # install composer
 RUN curl -sS --insecure https://getcomposer.org/installer | php -- --install-dir=/home/build/bin --filename=composer
