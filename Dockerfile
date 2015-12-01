@@ -32,6 +32,10 @@ RUN mkdir /home/build/bin && chmod -R 777 /home/build
 # install composer
 RUN curl -sS --insecure https://getcomposer.org/installer | php -- --install-dir=/home/build/bin --filename=composer
 
+# copy build script
+COPY build.sh /home/build/bin/build-application
+RUN chmod +x /home/build/bin/build-application
+
 # change user to prevent file creation from "root" on the host file system
 RUN chown -R build.build /home/build
 USER build
@@ -43,4 +47,4 @@ ENV PATH=/home/build/bin/:$PATH
 VOLUME ["/app"]
 WORKDIR /app
 
-CMD [ "cd build/ && composer update -o && vendor/bin/robo install" ]
+CMD build-application
