@@ -92,4 +92,4 @@ VOLUME ["/app"]
 WORKDIR /app
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["echo", "Use php, node, npm and composer"]
+CMD build-application
