@@ -1,14 +1,15 @@
-# create a container as "deploy" replacement
-# it's a container to build the web app without changing the host
-# "containerize all the things"
-
-FROM tsari/wheezy-apache-php-xdebug
+FROM tsari/jessie-apache2-php
 MAINTAINER Tibor Sári <tiborsari@gmx.de>
 
-# php
-ENV DEBIAN_FRONTEND noninteractive
-ENV NODE_VERSION 4.2.6
-ENV NPM_VERSION 3.7.1
+## add dotdeb to apt sources list
+RUN echo 'deb http://packages.dotdeb.org jessie all' > /etc/apt/sources.list.d/dotdeb.list
+RUN echo 'deb-src http://packages.dotdeb.org jessie all' >> /etc/apt/sources.list.d/dotdeb.list
+
+## add dotdeb key for apt
+RUN curl http://www.dotdeb.org/dotdeb.gpg | apt-key add -
+
+ENV NODE_VERSION 6.2.0
+ENV NPM_VERSION 3.9.0
 
 RUN \
     apt-get update -qqy && \
@@ -50,7 +51,7 @@ RUN \
         openssh-client \
         mysql-client \
         git \
-        subversion \
+        php7.0-memcached \
     && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -76,29 +77,19 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
   && rm "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc
 
 
-RUN npm install -g npm@$NPM_VERSION
+#RUN npm install -g npm@$NPM_VERSION
 RUN npm install -g node-gyp
 
-# add user
-RUN useradd -ms /bin/bash build
-RUN mkdir /home/build/bin
-
 # install composer
-RUN curl -sS --insecure https://getcomposer.org/installer | php -- --install-dir=/home/build/bin --filename=composer
+RUN curl -S --insecure -o /usr/local/bin/composer https://getcomposer.org/download/$COMPOSER_VERSION/composer.phar
+RUN chmod +x /usr/local/bin/composer
 
-# copy build script
-COPY build.sh /home/build/bin/build-application
-RUN chmod +x /home/build/bin/build-application
-
-# change user to prevent file creation from "root" on the host file system
-RUN chmod -R 777 /home/build && chown -R build.build /home/build
-USER build
-ENV HOME /home/build
-
-ENV PATH=/home/build/bin/:$PATH
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set up the application directory
 VOLUME ["/app"]
 WORKDIR /app
 
-CMD build-application
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["echo", "Use php, node, npm and composer"]
