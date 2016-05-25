@@ -10,6 +10,7 @@ RUN curl http://www.dotdeb.org/dotdeb.gpg | apt-key add -
 
 ENV NODE_VERSION 6.2.0
 ENV NPM_VERSION 3.9.0
+ENV COMPOSER_VERSION 1.1.1
 
 RUN \
     apt-get update -qqy && \
