@@ -9,6 +9,7 @@ MAINTAINER Tibor Sári <tiborsari@gmx.de>
 ENV DEBIAN_FRONTEND noninteractive
 ENV NODE_VERSION 4.2.6
 ENV NPM_VERSION 3.7.1
+ENV COMPOSER_VERSION 1.1.2
 
 RUN \
     apt-get update -qqy && \
@@ -51,6 +52,7 @@ RUN \
         mysql-client \
         git \
         subversion \
+        sudo \
     && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -79,26 +81,21 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
 RUN npm install -g npm@$NPM_VERSION
 RUN npm install -g node-gyp
 
-# add user
-RUN useradd -ms /bin/bash build
-RUN mkdir /home/build/bin
-
 # install composer
-RUN curl -sS --insecure https://getcomposer.org/installer | php -- --install-dir=/home/build/bin --filename=composer
+RUN curl -S --insecure -o /usr/local/bin/composer https://getcomposer.org/download/$COMPOSER_VERSION/composer.phar
+RUN chmod +x /usr/local/bin/composer
 
 # copy build script
-COPY build.sh /home/build/bin/build-application
-RUN chmod +x /home/build/bin/build-application
+COPY build.sh /usr/local/bin/build-application
+RUN chmod +x /usr/local/bin/build-application
 
-# change user to prevent file creation from "root" on the host file system
-RUN chmod -R 777 /home/build && chown -R build.build /home/build
-USER build
-ENV HOME /home/build
-
-ENV PATH=/home/build/bin/:$PATH
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set up the application directory
 VOLUME ["/app"]
 WORKDIR /app
 
+# Set up the command arguments
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD build-application
