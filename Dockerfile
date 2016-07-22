@@ -2,14 +2,14 @@
 # it's a container to build the web app without changing the host
 # "containerize all the things"
 
-FROM tsari/wheezy-apache-php-xdebug
+FROM tsari/jessie-php-fpm
 MAINTAINER Tibor Sári <tiborsari@gmx.de>
 
 # php
 ENV DEBIAN_FRONTEND noninteractive
 ENV NODE_VERSION 4.2.6
 ENV NPM_VERSION 3.7.1
-ENV COMPOSER_VERSION 1.1.2
+ENV COMPOSER_VERSION 1.2.0
 
 RUN \
     apt-get update -qqy && \
@@ -49,10 +49,11 @@ RUN \
         xz-utils \
         zlib1g-dev \
         openssh-client \
-        mysql-client \
+        postgresql-client \
         git \
         subversion \
         sudo \
+        unzip \
     && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
