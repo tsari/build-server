@@ -51,6 +51,7 @@ RUN \
         openssh-client \
         postgresql-client \
         git \
+        rsync \
         subversion \
         sudo \
         unzip \
