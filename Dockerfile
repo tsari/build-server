@@ -9,7 +9,7 @@ MAINTAINER Tibor Sári <tiborsari@gmx.de>
 ENV DEBIAN_FRONTEND noninteractive
 ENV NODE_VERSION 4.2.6
 ENV NPM_VERSION 3.7.1
-ENV COMPOSER_VERSION 1.2.0
+ENV COMPOSER_VERSION 1.2.2
 
 RUN \
     apt-get update -qqy && \
