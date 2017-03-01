@@ -11,7 +11,6 @@ Run the container from your project root directory.
         -e "GID=$(id -g)" \
         -e "HOME" \
         -v /home/$USER:/home/$USER \
-        -v /etc/machine-id:/etc-machine-id:ro \
         -v /etc/localtime:/etc/localtime:ro \
         -v $PWD:/app \
     tsari/build-server
@@ -29,7 +28,6 @@ You can run different build commands by providing an alternative command on star
             -e "GID=$(id -g)" \
             -e "HOME" \
             -v /home/$USER:/home/$USER \
-            -v /etc/machine-id:/etc-machine-id:ro \
             -v /etc/localtime:/etc/localtime:ro \
             -v $PWD:/app \
         tsari/build-server YOUR_COMMAND
