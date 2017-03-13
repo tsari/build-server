@@ -7,13 +7,15 @@ MAINTAINER Tibor Sári <tiborsari@gmx.de>
 
 # php
 ENV DEBIAN_FRONTEND noninteractive
-ENV NODE_VERSION 4.2.6
-ENV NPM_VERSION 3.7.1
-ENV COMPOSER_VERSION 1.2.2
+ENV NODE_VERSION 6.9.4
+ENV NPM_VERSION 3.10.10
+ENV COMPOSER_VERSION 1.3.0
 
 RUN \
     apt-get update -qqy && \
     apt-get install --no-install-recommends -qqy --force-yes \
+        apt-transport-https \
+        apt-utils \
         autoconf \
         automake \
         bzip2 \
@@ -54,9 +56,7 @@ RUN \
         rsync \
         subversion \
         sudo \
-        unzip \
-    && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        unzip
 
 RUN set -ex \
   && for key in \
@@ -72,19 +72,37 @@ RUN set -ex \
     gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
   done
 
-RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
-  && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
+# install specified node, npm and node-gyp
+RUN rm -rf /usr/local/bin/npm
+RUN rm -rf /usr/local/lib/node_modules
+RUN rm -rf ~/.npm
+
+RUN curl -sSLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
+  && curl -sSLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
   && gpg --verify SHASUMS256.txt.asc \
   && grep " node-v$NODE_VERSION-linux-x64.tar.gz\$" SHASUMS256.txt.asc | sha256sum -c - \
   && tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
   && rm "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc
 
+# install yarn
+RUN curl -sS "https://dl.yarnpkg.com/debian/pubkey.gpg" | apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
-RUN npm install -g npm@$NPM_VERSION
-RUN npm install -g node-gyp
+RUN \
+    apt-get update -qqy && \
+    apt-get install --no-install-recommends -qqy --force-yes \
+        yarn \
+    && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN npm install -g node-gyp npm@$NPM_VERSION
+
+# fix broken npm installation after npm installation (missing /usr/local/lib/node_modules/npm/node_modules) ...
+RUN cd /usr/local/lib/node_modules/npm \
+    && yarn install
 
 # install composer
-RUN curl -S --insecure -o /usr/local/bin/composer https://getcomposer.org/download/$COMPOSER_VERSION/composer.phar
+RUN curl -sS --insecure -o /usr/local/bin/composer https://getcomposer.org/download/$COMPOSER_VERSION/composer.phar
 RUN chmod +x /usr/local/bin/composer
 
 # copy build script
