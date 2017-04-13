@@ -30,4 +30,4 @@ You can run different build commands by providing an alternative command on star
             -v /home/$USER:/home/$USER \
             -v /etc/localtime:/etc/localtime:ro \
             -v $PWD:/app \
-        tsari/build-server YOUR_COMMAND
+        tsari/build-server YOUR_COMMAND "@"

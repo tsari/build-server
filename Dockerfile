@@ -2,14 +2,14 @@
 # it's a container to build the web app without changing the host
 # "containerize all the things"
 
-FROM tsari/jessie-php-fpm
+FROM tsari/wheezy-apache-php-xdebug
 MAINTAINER Tibor Sári <tiborsari@gmx.de>
 
 # php
 ENV DEBIAN_FRONTEND noninteractive
 ENV NODE_VERSION 4.2.6
 ENV NPM_VERSION 3.7.1
-ENV COMPOSER_VERSION 1.2.2
+ENV COMPOSER_VERSION 1.4.1
 
 RUN \
     apt-get update -qqy && \
@@ -49,7 +49,7 @@ RUN \
         xz-utils \
         zlib1g-dev \
         openssh-client \
-        postgresql-client \
+        mysql-client \
         git \
         rsync \
         subversion \
@@ -91,7 +91,7 @@ RUN chmod +x /usr/local/bin/composer
 COPY build.sh /usr/local/bin/build-application
 RUN chmod +x /usr/local/bin/build-application
 
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+ADD https://raw.githubusercontent.com/tsari/docker-entrypoint/master/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set up the application directory
