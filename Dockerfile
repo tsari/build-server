@@ -11,6 +11,8 @@ ENV NODE_VERSION 4.2.6
 ENV NPM_VERSION 3.7.1
 ENV COMPOSER_VERSION 1.4.1
 
+RUN echo "deb http://ftp.de.debian.org/debian wheezy-backports main" >> /etc/apt/sources.list.d/backports.list
+
 RUN \
     apt-get update -qqy && \
     apt-get install --no-install-recommends -qqy --force-yes \
@@ -50,11 +52,13 @@ RUN \
         zlib1g-dev \
         openssh-client \
         mysql-client \
-        git \
         rsync \
         subversion \
         sudo \
         unzip \
+    && \
+    apt-get -t wheezy-backports install --no-install-recommends -qqy --force-yes \
+        git \
     && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
