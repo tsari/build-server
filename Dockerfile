@@ -19,6 +19,7 @@ RUN \
         autoconf \
         automake \
         bzip2 \
+        ca-certificates \
         file \
         g++ \
         gcc \
@@ -57,7 +58,7 @@ RUN \
         sudo \
         unzip \
     && \
-    apt-get -t wheezy-backports install --no-install-recommends -qqy --force-yes \
+    apt-get -t wheezy-backports install -qqy --force-yes \
         git \
     && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
